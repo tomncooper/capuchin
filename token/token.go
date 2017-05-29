@@ -34,3 +34,20 @@ const (
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
 )
+
+// keywords defines the language reserved keywords
+var keywords = map[string]TokenType{
+	"fn":  FUNCTION,
+	"let": LET,
+}
+
+// lookupIdent takes the supplied string and check first if it is reserved
+// keyword, if so it will return the corresponding token (stored in the
+// keywords variable). If the supplied string is not a key word the IDENT token
+// will be returned.
+func LookupIdent(ident string) TokenType {
+	if tok, ok := keywords[ident]; ok {
+		return tok
+	}
+	return IDENT
+}

@@ -1,6 +1,8 @@
 package lexer
 
-import "capuchin/token"
+import (
+	"capuchin/token"
+)
 
 // Lexer is the lexical analyser for the Capuchin programming language
 type Lexer struct {
@@ -47,6 +49,9 @@ func (l *Lexer) NextToken() token.Token {
 
 	var tok token.Token
 
+	// Advance the lexer past any whitespace characters
+	l.skipWhitespace()
+
 	switch l.ch {
 	case '=':
 		tok = newToken(token.ASSIGN, l.ch)
@@ -67,6 +72,17 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+	default:
+		// If non of the switch statements are triggered see if this is
+		// a letter.
+		if isLetter(l.ch) {
+			tok.Literal = l.readIdentifier()
+			tok.Type = token.LookupIdent(tok.Literal)
+			return tok
+		} else {
+			// If it is not a switch or letter then it is not valid
+			tok = newToken(token.ILLEGAL, l.ch)
+		}
 	}
 
 	// Advance the lexer to the next character of the input string
@@ -78,4 +94,61 @@ func (l *Lexer) NextToken() token.Token {
 // using the supplied Type and character bytes.
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
+}
+
+// readIdentifier will iterate trough the characters in the lexer's input
+// string until it the isLetter function returns false. It will then return the
+// characters from the initial position in the input string up to the index
+// where isLetter returned false.
+func (l *Lexer) readIdentifier() string {
+	position := l.position
+	for isLetter(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+// isLetter will test if the supplied character byte is a letter (upper or
+// lower case as well as '_').
+func isLetter(ch byte) bool {
+
+	letter := false
+
+	if 'a' <= ch && ch <= 'z' {
+		letter = true
+	} else if 'A' <= ch && ch <= 'Z' {
+		letter = true
+	} else if ch == '_' {
+		letter = true
+	}
+
+	return letter
+}
+
+// isWhitespace checks weather the supplied character bytes correspond to a
+// whitespace character.
+func isWhitespace(ch byte) bool {
+
+	whitespace := false
+
+	if ch == ' ' {
+		whitespace = true
+	} else if ch == '\t' {
+		whitespace = true
+	} else if ch == '\n' {
+		whitespace = true
+	} else if ch == '\r' {
+		whitespace = true
+	}
+
+	return whitespace
+}
+
+// skipWhitespace will advance the lexer along its input string until a non
+// whitespace character is found.
+func (l *Lexer) skipWhitespace() {
+
+	for isWhitespace(l.ch) {
+		l.readChar()
+	}
 }
