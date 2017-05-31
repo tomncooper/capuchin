@@ -6,15 +6,12 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5;
-	let ten = 10;
-
-	let add = fn(x, y) {
-	    x + y;
-	};
-
-	let result = add(five, ten);
-	`
+	input := "let five = 5;\n" +
+		"let ten = 10;\n" +
+		"let add = fn(x, y) {\n" +
+		"x + y;\n" +
+		"};\n" +
+		"let result = add(five, ten);\n"
 
 	tests := []struct {
 		expectedType    token.TokenType

@@ -79,6 +79,10 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
+		} else if isDigit(l.ch) {
+			tok.Type = token.INT
+			tok.Literal = l.readNumber()
+			return tok
 		} else {
 			// If it is not a switch or letter then it is not valid
 			tok = newToken(token.ILLEGAL, l.ch)
@@ -108,6 +112,18 @@ func (l *Lexer) readIdentifier() string {
 	return l.input[position:l.position]
 }
 
+// readNumber will iterate through the characters of the lexer's input string
+// until it reaches a character that is not a digit (assessed via the isDigit
+// function. It will then return the sub-string from the initial starting
+// position to the index before the non-digit character.
+func (l *Lexer) readNumber() string {
+	position := l.position
+	for isDigit(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
 // isLetter will test if the supplied character byte is a letter (upper or
 // lower case as well as '_').
 func isLetter(ch byte) bool {
@@ -125,30 +141,17 @@ func isLetter(ch byte) bool {
 	return letter
 }
 
-// isWhitespace checks weather the supplied character bytes correspond to a
-// whitespace character.
-func isWhitespace(ch byte) bool {
-
-	whitespace := false
-
-	if ch == ' ' {
-		whitespace = true
-	} else if ch == '\t' {
-		whitespace = true
-	} else if ch == '\n' {
-		whitespace = true
-	} else if ch == '\r' {
-		whitespace = true
-	}
-
-	return whitespace
+// isDigit checks weather the supplied character byte corresponds to a
+// numerical digit
+func isDigit(ch byte) bool {
+	return '0' <= ch && ch <= '9'
 }
 
 // skipWhitespace will advance the lexer along its input string until a non
 // whitespace character is found.
 func (l *Lexer) skipWhitespace() {
 
-	for isWhitespace(l.ch) {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
 }
