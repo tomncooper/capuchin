@@ -58,8 +58,8 @@ func (l *Lexer) NextToken() token.Token {
 			ch := l.ch
 			l.readChar()
 			literal := string(ch) + string(l.ch)
-			// We don't use newToken as it calls string on the literal
-			// argument
+			// We don't use newToken as it calls string on the
+			// literal argument
 			tok = token.Token{Type: token.EQ, Literal: literal}
 		} else {
 			tok = newToken(token.ASSIGN, l.ch)
