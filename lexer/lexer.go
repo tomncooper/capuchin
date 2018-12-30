@@ -10,8 +10,8 @@ type Lexer struct {
 	// input is the string being analysed by the lexer.
 	input string
 
-	// position is the current location in the input string and points to the
-	// char currently being processed.
+	// position is the current location in the input string and points to
+	// the char currently being processed.
 	position int
 
 	// readPosition points to the next char to be read by the lexer.
